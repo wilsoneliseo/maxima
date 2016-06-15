@@ -1,0 +1,107 @@
+/*-------------------------Método de Muller -------------------------
+#+TITLE:     Metodo de Muller
+#+AUTHOR:    Wilson S. Tubin
+#+EMAIL:     wilsoneliseogt@gmail.com
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: Metodo de Muller para encontrar ceros de una funcion f
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+Para encontrar la solucion ~f(x)=0~ se necesita tres aproximaciones
+iniciales ~p_0~, ~p_1~, ~p_2~
+
+1) ENTRADA
+    - aproximaciones iniciales a la raiz ~p_0~, ~p_1~, ~p_2~
+    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - maximo numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de la solucion en la columna ~p~
+3) EJEMPLO
+   Encontrar la raiz real positiva de la funcion
+   f(x):=x^3-2*x^3-12*x^2+16*x-40 por el método de Muller con una
+   tolerancia de 0.00001. Las aproximaciones iniciales son ~p_0=4~,
+   ~p_1=4.5~, ~p_2=5~
+
+    solucion: ingrese esto en /maxima/ para utilizar la funcion /muller/. 
+	
+	#+BEGIN_EXAMPLE
+	(%i1) f(x):=x^4-2*x^3-12*x^2+16*x-40;
+                            3      3           2
+        (%o1)      f(x) := x  - 2 x  + (- 12) x  + 16 x - 40
+
+        (%i2) muller(4, 4.5, 5, 5, 20);
+	#+END_EXAMPLE
+
+    haciendo esto devuelve una tabla con quince columnas conteniendo
+    diferentes valores, incluidos con fines didacticos. Observando el
+    ultimo valor de la columna ~p~ se obtiene la aproximacion del
+    cero: para este ejemplo es ~4.3811134~. El código para /maxima/
+    para la función /muller/, utilizada en este ejemplo es: (recuerde
+    guardar el codigo en una archivo con la extensión /mac/ y cargarlo
+    con /load/)
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+muller(p_0,p_1,p_2,expo,N):=block
+(    
+   [indice:0,sigo:true,h1,h2,r1,r2,d,b,D,E,h,TOL,er,tabla:matrix\
+   (['N,'X_0,'X_1,'X_2,'h1,'h2,'r1,'r2,'d,'b,'D,'E,'h,'p,'error])],
+
+   fpprintprec:expo+3,
+   TOL:(10)^(-expo),
+   h1:p_1-p_0,
+   h2:p_2-p_1,
+   r1:(f(p_1)-f(p_0))/h1,
+   r2:(f(p_2)-f(p_1))/h2,
+   d:(r2-r1)/(h2+h1),
+
+   for i:1 step 1 while (i<=N and sigo=true) do
+   (
+      indice:i,
+      b:r2+h2*d,
+      D:sqrt(b^2-4*f(p_2)*d),
+      
+      if (  abs(b-D)<abs(b+D)  ) then er:b+D
+      else er:b-D,
+
+      h:-2*f(p_2)/er,
+      p:p_2+h,
+
+      tabla:addrow(tabla,[i,p_0,p_1,p_2,h1,h2,r1,r2,d,b,D,er,h,p,abs(h)]),
+      
+      if (abs(h) < TOL) then
+      (
+         print("Tolerancia cumplida con exito, porque el error=",abs(h)),
+	 print( "es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL ),
+	 print("Por lo tanto la solucion aproximada es:",p),
+	 sigo:false
+      ),
+    
+      p_0:p_1,
+      p_1:p_2,
+      p_2:p,
+      h1:p_1-p_0,
+      h2:p_2-p_1,
+      r1:(f(p_1)-f(p_0))/h1,
+      r2:(f(p_2)-f(p_1))/h2,
+      d:(r2-r1)/(h2+h1)
+   ),
+   
+   if (indice=N) then 
+   (
+      print(concat("Parametro N=",N," se cumplio."))
+   ),
+
+   print("WeGT."),
+   return(tabla)
+)$
+/*#+END_EXAMPLE*/

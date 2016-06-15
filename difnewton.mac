@@ -1,0 +1,156 @@
+/*----------------DIFERENCIAS DIVIDIDAS DE NEWTON---------------------
+#+TITLE:     Polinomio De Interpolación Con Diferencias Divididas Progresivas y Regresivas De Newton
+#+AUTHOR:    Wilson S. Tubín
+#+EMAIL:     wilsoneliseogt@gmail.com
+#+DATE:      2016-03-31 jue
+#+DESCRIPTION: método de interpolación y extrapolación
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+Este es otro método de interpolación y extrapolación, también necesita
+pares de puntos en el plano para poder predecir un valor ~f(x)~ dado un
+valor ~x~. Este método predice valores a través de un polinomio de
+diferencias divididas.
+
+1) ENTRADA
+    - matrix de ~2xn~ o de ~nx2~. Para el primer caso la primera fila
+      corresponden a los numeros ~x_0~, ~x_1~ ,..., ~x_n~ y la segunda fila
+      los valores de la evaluacion de los ~x~ en la funcion ~f~. Para el
+      segundo caso son ~n~ filas de pares de valores de la forma
+      ~[x_0, f(x_0)]~, ~[x_1,f(x_1)]~ ,..., ~[x_n,f(x_n)]~
+
+2) SALIDA
+    - Definicion de las funciones pProg(x) y pReg(x) como polinomio de
+      diferencias progresivas y polinomio de diferencias
+      regresivas. Tambien muestra la matriz con los valores utilizados
+      para encontrar las funciones pProg(x) y pReg(x)
+3) EJEMPLO
+    Calcule el polinomio de diferencias regresivas y progresivas de newton para
+    aproximar f(6.5) de los siguientes datos.
+                            | x | f(x) |
+                            |---+------|
+                            | 3 |    8 |
+                            | 5 |   16 |
+                            | 6 |   23 |
+                            | 9 |   56 |
+
+    solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
+        sesion en /maxima/ utilizando la funcion /neville/.
+	
+	#+BEGIN_EXAMPLE
+	(%i1) a:matrix([3,5,6,9],[8,16,23,30]);
+                     [ 3  5   6   9  ]
+        (%o1)        [               ]
+                     [ 8  16  23  30 ]
+        (%i2) difnewton(a);
+              -------Polinomio diferencias PROGRESIVAS---------- 
+              pProg(x) := 8 + 4 (x - 3) + 1 (x - 3) (x - 5)
+                             + (- 0.3611111111111) (x - 3) (x - 5) (x - 6) + 0 
+ 
+              -------Polinomio diferencias REGRESIVAS---------- 
+              pReg(x) := 30 + 2.333333333333334 (x - 9)
+              + (- 1.16666666666667) (x - 9) (x - 6)
+              + (- 0.3611111111111) (x - 9) (x - 6) (x - 5) + 0 
+
+                 [ X  F(x)   Columna 1   Columna 2   Columna 3   ]
+                 [                                               ]
+                 [ 3   8        0           0           0        ]
+                 [                                               ]
+        (%o2)    [ 5   16       4           0           0        ]
+                 [                                               ]
+                 [ 6   23       7           1           0        ]
+                 [                                               ]
+                 [ 9   30    2.333333   - 1.16666  - 0.361111    ]
+		
+	#+END_EXAMPLE
+
+    por lo tanto la interpolación, de ~f(6.5)~, se obtiene evaluando
+    ~6.5~ ya sena en ~pProg~ o en ~pReg~. A saber
+    pProg(6.5)=26.302083. El código para /maxima/ para la función
+    /difnewton/, utilizada en este ejemplo es: (recuerde guardar el
+    codigo en una archivo con la extensión /mac/ y cargarlo con
+    /load/)
+
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+difnewton(tabla):=block
+(
+    [xe,F,n,resp,titulo,polprog:"",polreg:"",fac:"",simplificado,j,jo,esNumeroX:true,esNumeroY:true],
+    n:length(tabla),
+    colum:length(tabla[1]),
+    if (n=2 and colum>2) then
+    (
+      tabla:transpose(tabla),
+      n:length(tabla)
+    )else print("OJO: revisar que columnas son x,y"),
+
+    x:col(tabla,1),
+    F:zeromatrix(n,n-1),
+    F:addcol(col(tabla,2),F),
+
+    for i:2 thru n do
+    (
+        for j:2 thru i do
+        (
+            F[i][j]:(F[i][j-1]-F[i-1][j-1])/(x[i][1]-x[i-j+1][1])
+        )
+    ),
+   
+    resp:addcol(x,F),
+    
+    titulo:matrix(["X","F(x)"]),
+    for i:1 thru n-1 do
+    (
+        titulo:addcol(titulo,[concat("Columna ",i)])
+    ),
+    resp:addrow(titulo,resp),
+    
+    /*ver si todos los elementos de la matriz son numeros*/
+    for i:1 step 1 while (i<=n and esNumeroX=true and esNumeroY=true) do
+    (
+      esNumeroX:floatnump(tabla[i][1]) or integerp(tabla[i][1]),
+      esNumeroY:floatnump(tabla[i][2]) or integerp(tabla[i][2])
+    ),
+    
+    if ( (esNumeroX and esNumeroY) ) then
+    (
+       /*formando polinomio diferencias progresivas*/
+       for i:1 thru n do
+       (
+   	polprog:concat(polprog,F[i][i],fac,"+"),
+   	fac:concat(fac,"*(x-",x[i][1],")")
+       ),
+       eval_string(concat("pProg(x):=",polprog,"0")),
+       print("-------Polinomio diferencias PROGRESIVAS----------"),
+       print(fundef(pProg)),
+       print(""),
+   
+   
+       /*formando polinomio diferencias regresivas*/
+       fac:"",
+       j:n,
+       jo:1,
+       while(j>0)do
+       (
+   	polreg:concat(polreg,F[n][jo],fac,"+"),
+   	fac:concat(fac,"*(x-",x[j][1],")"),
+           j:j-1,
+           jo:jo+1
+       ),
+       eval_string(concat("pReg(x):=",polreg,"0")),
+       print("-------Polinomio diferencias REGRESIVAS----------"),
+       print(fundef(pReg)),
+       print("")
+    ),
+
+    return(resp)
+)$
+/*#+END_EXAMPLE*/

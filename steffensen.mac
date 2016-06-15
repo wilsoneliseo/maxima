@@ -1,0 +1,96 @@
+/*-------------------------Steffensen-------------------------
+#+TITLE:     steffensen.mac
+#+AUTHOR:    wilson
+#+EMAIL:     wilson@debian
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+
+Encuentra la solución ~p=g(p)~ con una proximación inicial ~p_0~.
+
+1) ENTRADA
+    - aproximacion inicial ~p_0~
+    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - maximo numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de la solucion en la columna ~p~
+3) EJEMPLO: Aplique el Método de Steffesen para encontrar la
+aproximación a la raíz de la función ~f(x)=x-2^(-x)~ en el intervalo de
+~[0, 1]~ con una aproximación incial de ~p_0=0.5~ y una
+~tolerancia<1*10^(-3)~
+
+    solucion: De las distintas formas de despejar una ~x~ una es
+        ~x=2^(-x)~ y que cumpla con ~| g'(x_0) |<1 |~ garantiza la
+        convergencia del método, por lo que haga lo siguiente en
+        /maxima/:
+	
+	#+BEGIN_EXAMPLE
+        (%i1) g(x):=2^(-x); steffensen(0.5,3,20);
+
+        (%o2)               g(x) := 2
+
+              [ n    p0      p1      p2      p        error    ]
+              [                                                ]
+              [ 1   0.5    0.7071  0.6125  0.6422    0.1422    ]
+        (%o3  [                                                ]
+              [ 2  0.6422  0.6407  0.6414  0.6412   0.001002   ]
+              [                                                ]
+              [ 3  0.6412  0.6412  0.6412  0.6412  4.755593E-8 ]
+	#+END_EXAMPLE
+
+    por lo tanto la solución es ~p=0.6412~. El código para
+    /maxima/ para la función /steffensen/, utilizada en este
+    ejemplo es: (recuerde guardar el codigo en una archivo con la
+    extensión /mac/ y cargarlo con /load/)
+
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+steffensen(p_0,expo,N):=block
+(
+    [indice:0,sigo:true,p,p_1,p_2,er,TOL,tabla:matrix(["n","p0","p1","p2","p","error"])],
+    fpprintprec:expo+3,
+    TOL:(10)^(-expo),
+
+    for i:1 step 1 while (i<=N and sigo=true) do
+    (
+        indice:i,
+        p_1:g(p_0),
+        p_2:g(p_1),
+        p:p_0-((p_1-p_0)^2)/(p_2-2*p_1+p_0),
+        er:abs(p-p_0),
+
+        tabla:addrow(tabla,[i,p_0,p_1,p_2,p,er]),
+        
+        if is(er<TOL) then
+        (
+          print("Tolerancia cumplida con exito, porque el error=",er),
+          print( concat("es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL) ),
+          print("Por lo tanto la solucion aproximada es:",p),
+
+          sigo:false
+        ),
+          
+        p_0:p
+    ),
+
+   if (indice=N) then 
+   (
+      print(concat("Parametro N=",N," se cumplio."))
+   ),
+
+   print("WeGT."),
+   return(tabla)
+)$
+/*#+END_EXAMPLE*/

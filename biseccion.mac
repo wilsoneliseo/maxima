@@ -1,0 +1,130 @@
+/*-------------------------BISECCION-------------------------
+#+TITLE:     biseccion.mac
+#+AUTHOR:    wilson
+#+EMAIL:     wilson@debian
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+
+Busca la solucion de ~f(x)=0~ donde ~f~ es continua en el intervalo
+~[a,b]~ y donde ~f(a)~ y ~f(b)~ tienen signos opuestos
+
+1) ENTRADA
+    - puntos ~a~ y ~b~
+    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de la solucion ~p~.
+3) EJEMPLO: Se quiere encontrar la raiz de ~f(x)=x^3+4*x^2-10~ en el
+    intervalo ~[1, 1.5]~ con una tolerancia menor de ~1*10^(-2)~
+
+    Solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
+        sesion en /maxima/ utilizando la funcion /biseccion/.
+
+	#+BEGIN_EXAMPLE
+	(%i1) f(x):=x^3+4*x^2-10; biseccion(1, 1.5, 2, 20);
+        (%o1)            f(x) := x  + 4 x  - 10
+        (%o4) 
+        [ N    a       b      p       f(a)    f(b)     f(p)    f(a) f(p)   error  ]
+        [                                                                         ]
+        [ 1    1      1.5    1.25     - 5     2.375  - 1.7969   8.9844     0.25   ]
+        [                                                                         ]
+        [ 2   1.25    1.5   1.375   - 1.7969  2.375   0.162     - 0.291    0.125  ]
+        [                                                                         ]
+        [ 3   1.25   1.375  1.3125  - 1.7969  0.162  - 0.848    1.5244    0.0625  ]
+        [                                                                         ]
+        [ 4  1.3125  1.375  1.3438  - 0.848   0.162  - 0.351     0.298    0.0313  ]
+        [                                                                         ]
+        [ 5  1.3438  1.375  1.3594  - 0.351   0.162  - 0.0964   0.0338    0.0156  ]
+        [                                                                         ]
+        [ 6  1.3594  1.375  1.3672  - 0.0964  0.162   0.0324   - 0.00312  0.00781 ]
+	#+END_EXAMPLE
+    por lo tanto la solución es ~p=1.3672~. El código para /maxima/
+    para la función /biseccion/, utilizada en este ejemplo es: (recuerde guardar
+   el codigo en una archivo con la extensión /mac/ y cargarlo con /load/)
+	
+
+#+BEGIN_EXAMPLE
+*/ 
+numer:true$
+biseccion(a,b,expo,N):=block
+(    
+   [indice:0,ban:false,sigo:true,fa,fp,fb,fafp,TOL,p,er,tabla:matrix(['N,'a,'b,'p,'f('a),'f('b),'f('p),'f('a)*'f('p),'error])],
+
+   fpprintprec:expo+3,
+   fa:f(a),
+   TOL:(10)^(-expo),
+   for i:1 step 1 while (i<=N and sigo=true) do
+   (
+      indice:i,
+      p:((a+b)/2),
+      fp:f(p),
+      fb:f(b),
+      er:((b-a)/2),
+      fafp:fa*fp,
+
+      /*----------------------------------------------------------------------------
+         si fa*fb>0 es cierto, entonces, significa que fa y fb tiene el mismo signo
+         por lo tanto no hay cambio de signo
+      -----------------------------------------------------------------------------*/
+      if ( fa*fb > 0 ) then
+      (	  
+         print( concat("Error: deberia de haber cambio de signo en la iteracion N=",i) ),
+	 print( concat("     f(a)=f(",a,")=",fa) ),
+	 print( concat("     f(b)=f(",b,")=",fb) ),
+         ban:true
+      ),
+      tabla:addrow(tabla,[i,a,b,p,fa,fb,fp,fafp,er]),
+      
+      if ( ban=false and (fp=0 or er < TOL)  ) then
+      (
+         print("Tolerancia cumplida con exito, porque el error=",er),
+	 print( concat("es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL) ),
+         print("En todas las iteraciones f(a) y f(b) tienen signos opuestos"),
+         print("entonces la solucion \"p\" aproximada es:",p),
+	 sigo:false
+      )
+      elseif ( ban=true and (fp=0 or er < TOL)  ) then
+      (
+        print("Tolerancia cumplida, porque el error=",er),
+        print( concat("es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL) ),
+        print("OJO NO se cumple f(a) y f(b) opuestos al menos en algun N, tome el"),
+        print("valor de \"p\" inmediato anterior al primer mensaje de error."),
+        sigo:false
+      )
+      elseif (fafp>0) then
+      (
+         a:p,
+         fa:fp
+      )
+      else
+      (
+         b:p
+      )
+   ),
+   
+   if (indice=N and ban=false) then 
+   (
+      print(concat("Parametro N=",N," se cumplio. Hay cambios de signo")),
+      print("entre f(a) y f(b) en todas las iteraciones hechas.")
+   )elseif (indice=N and ban=true) then 
+   (
+     print(concat("Parametro N=",N," se cumplio. En algunas iteraciones")),
+     print("no hay cambios de signo entre f(a) y f(b) y deberian")
+   ),
+
+   print("WeGT."),
+   return(tabla)
+)$
+/*#+END_EXAMPLE*/

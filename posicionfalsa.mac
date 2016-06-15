@@ -1,0 +1,115 @@
+/*-----------------METODO DE POSICION FALSA O REGULA FARSI--------------------
+#+TITLE:     posicionfalsa.mac
+#+AUTHOR:    wilson
+#+EMAIL:     wilson@debian
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+
+Para encontrar la solucion ~f(x)=0~ se necesita el intervalo
+~[p_0, p_1]~ en el cual se encuentra la raiz. Ademas ~f(p_0)~ y
+~f(p_1)~ tienen signos opuestos.
+
+1) ENTRADA
+    - valores ~p_0~ ~p_1~
+    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - maximo numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de la solucion en la columna ~X_n+1~
+3) EJEMPLO
+    Aplique el metodo de posicion falsa para encontrar la raiz en el
+    intervalo ~[3, 4]~ de la funcion ~f(x):=3*x^2-e^x~ con una
+    ~tolerancia<1*10^(-4)~
+
+    solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
+        sesion en /maxima/ utilizando la funcion /posicionfalsa/.
+
+	#+BEGIN_EXAMPLE
+        (%i1) f(x):=3*x^2-%e^x; posicionfalsa(3,4,4,20);
+                                      2     x
+        (%o1)              f(x) := 3 x  - %e
+
+               [ N  X_n - 1    X_n     X_n + 1      error     ]
+               [                                              ]
+               [ 1     3        4      3.511704     0.4883    ]
+               [                                              ]
+               [ 2     4     3.511704  3.680658    0.16895    ]
+               [                                              ]
+               [ 3     4     3.680658  3.72156     0.040901   ]
+        (%o7)  [                                              ]
+               [ 4     4     3.72156   3.730592   0.0090324   ]
+               [                                              ]
+               [ 5     4     3.730592  3.732544   0.0019521   ]
+               [                                              ]
+               [ 6     4     3.732544  3.732964  4.1990064E-4 ]
+               [                                              ]
+               [ 7     4     3.732964  3.733054  9.0229709E-5 ]
+	#+END_EXAMPLE
+
+    por lo tanto la solución es ~X_n + 1=3.733054~. El código para
+    /maxima/ para la función /posicionfalsa/, utilizada en este
+    ejemplo es: (recuerde guardar el codigo en una archivo con la
+    extensión /mac/ y cargarlo con /load/)
+	
+
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+posicionfalsa(p_0,p_1,expo,N):=block
+(    
+   [indice:0,sigo:true, p, fp_0, fp_1, fp, TOL,er,tabla:matrix(['N,'X_n-1,'X_n,'X_n+1,'error])],
+
+   fpprintprec:(expo+3),
+   TOL:(10)^(-expo),
+   fp_0:f(p_0),/* p_0=x_{n-1} */
+   fp_1:f(p_1),/*p_1=x_n*/
+   for i:1 step 1 while (i<=N and sigo=true) do
+   (
+      indice:i,
+      if (fp_0*fp_1>0) then print("f(p_0) y f(p_1) signos no opuestos en N=",i),
+      p:p_1-fp_1*(p_1-p_0)/(fp_1-fp_0),/*p=x_{n+1}*/
+
+      er:abs(p-p_1),
+
+      tabla:addrow(tabla,[i,p_0,p_1,p,er]),
+      
+      if (er < TOL) then
+      (
+         print("Tolerancia cumplida con exito, porque el error=",er),
+	 print( concat("es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL) ),
+	 print("Por lo tanto la solucion aproximada es:",p),
+	 sigo:false
+      ),
+    
+      fp:f(p),
+
+      if (fp*fp_1<0) then
+      (
+        p_0:p_1,
+        fp_0:fp_1
+       ),
+
+      p_1:p,
+      fp_1:fp
+   ),
+   
+   if (indice=N) then 
+   (
+      print(concat("Parametro N=",N," se cumplio."))
+   ),
+
+   print("WeGT."),
+   return(tabla)
+)$
+/*#+END_EXAMPLE*/

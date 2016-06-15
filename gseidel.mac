@@ -1,0 +1,150 @@
+/*-------------------------METODO DE GAUSS-SEIDEL-------------------------
+#+TITLE:     Método de Gauss-Seidel
+#+AUTHOR:    wilson
+#+EMAIL:     wilson@debian
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+El método de /Gauss-Seidel/ es muy semejante al método de
+/Jacobi/. Mientras que en el de Jacobi se utiliza el valor de las
+incógnitas para determinar una nueva aproximación, EN EL DE
+GAUSS-SEIDEL SE VA UTILIZANDO LOS VALORES DE LAS INCÓGNITAS RECIÉN
+CALCULADOS EN LA MISMA ITERACIÓN, y no en la siguiente.
+
+1) ENTRADA
+    - A=matriz de coeficientes
+    - b=matriz columna de los valores del otro miembro de cada ecuacion.    
+    - x_0=aproximacion al vector solucion como punto de partida de 
+      las iteraciones. Debe ser una matriz de 1xn.
+    - expo=exponente la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - maximo numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de las soluciones.
+3) EJEMPLO
+    Resolver el siguiente sistema de ecuación por el método Gauss-Seidel
+    utilizando un Tol< 0.001 y x_0=[0, 0, 0]
+          0.1x_1  -    7x_2  - 0.3x_3  = -19.30
+            3x_1  -  0.1x_2  - 0.2x_3  = 7.85
+          0.3x_1  -  0.2x_2  -  10x_3  = 71.40
+
+solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
+        sesion en /maxima/ utilizando la funcion /newton/.
+	
+	#+BEGIN_EXAMPLE
+	(%i1) A:matrix([3,-0.1,-0.2],[0.1,7,-0.3],[0.3,-0.2,-10]);
+              b:matrix([7.85],[-19.30],[71.4]);
+              x_0:matrix([0,0,0]);
+                             [  3   - 0.1  - 0.2 ]
+                             [                   ]
+                             [ 0.1    7    - 0.3 ]
+                             [                   ]
+                             [ 0.3  - 0.2  - 10  ]
+                                  [  7.85  ]
+                                  [        ]
+                                  [ - 19.3 ]
+                                  [        ]
+                                  [  71.4  ]
+                                  [        ]
+                                  [  71.4  ]
+                                  [ 0  0  0 ]
+        (%i2) gseidel(A,b,x_0,3,20);
+	#+END_EXAMPLE
+
+     El código para /maxima/ para la función /gseidel/, utilizada en
+    este ejemplo es: (recuerde guardar el codigo en una archivo con la
+    extensión /mac/ y cargarlo con /load/)
+
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+gseidel(A,b,x_0,expo,N):=block
+(
+    [bool:true,x,er,temp,fila,TOL,tb,n],
+    fpprintprec:expo+3,
+    TOL:(10)^(-expo),
+    n:length(A),
+    x:copymatrix(x_0),
+    tb:matrix(["N"]),
+    tb:addcol(tb,makelist(concat("X",i),i,n),makelist(concat("EX",i),i,n),["ERROR"]),
+    for k:1 step 1 while (k<=N and bool=true) do
+    (
+        for i:1 thru n do(            
+            x[1][i]:(1/A[i][i])*(-lsum(A[i][j]*x[1][j],j,makelist(expre,expre,1,i-1))-lsum(A[i][j]*x_0[1][j],j,makelist(expre,expre,i+1,n))+b[i][1])
+        ),
+        er:abs(x-x_0),
+        temp:sort(list_matrix_entries(er), 'ordergreatp),        
+        fila:matrix([k]),
+        fila:addcol(fila,x,er,[temp[1]]),
+        tb:addrow(tb,fila),
+        if is(temp[1]<TOL) then
+        (
+            print("tolerancia cumplida"),
+            bool:flase
+        ),
+        x_0:copymatrix(x)
+    ),
+    if bool then print("Iteraciones agotadas"),
+    return(tb)
+)$
+
+dominante(matriz):=block
+(
+   [n,noCumple:0,suma:0,numDiagonal,k:0],
+   
+   n:length(matriz),
+   if ( matrixp(matriz)=true ) then
+   (
+
+     for i:1 step 1 while (i<=n) do
+     (
+          k:k+abs(matriz[i][i])
+     ),
+    print("Suma valores abs diagonal es ", k),
+
+     for i:1 step 1 while (i<=n) do
+     (
+        for j:1 step 1 while (j<=n) do
+        (
+          if (i=j) then
+            numDiagonal:abs(matriz[i][j])
+          else
+          (
+            suma:suma+abs(matriz[i][j])
+          )
+        ),
+
+        print(numDiagonal,">",suma,"  es ",is(numDiagonal>suma) ),
+        
+        if(numDiagonal>suma) then
+        (
+           noCumple:noCumple+0
+         )
+        else
+        (
+           noCumple:noCumple+1
+        ),
+           
+        suma:0
+     ),   /*fin for*/
+   
+     if (noCumple=0) then
+       print("Matriz diagonalmente dominante")
+     else
+       print("Matriz parcialmente dominante")
+   )else(
+     print("Ingrese una matriz")
+   ),
+ return("---WeGT---")
+)$
+/*#+END_EXAMPLE*/

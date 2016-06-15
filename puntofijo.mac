@@ -1,0 +1,93 @@
+/*-------------------------PUNTO FIJO-------------------------
+#+TITLE:     puntofijo.mac
+#+AUTHOR:    wilson
+#+EMAIL:     wilson@debian
+#+DATE:      2016-02-27 sáb
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+Busca una solucion tal que ~g(p)=p~ con una aproximacion
+inicial ~p_0~
+
+1) ENTRADA
+    - aproximacion incial ~p_0~
+    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
+      ~1*10^(-3)~ ~expo~ vale ~3~
+    - maximo numero de iteraciones ~N~
+2) SALIDA
+    - matriz con valores varios para cada iteracion, conteniendo
+      los valores aproximados de la solucion en la columna ~g(x)~
+3) EJEMPLO
+    usando el metodo de punto fijo aproximar la solucion de la
+    ecuacion ~f(x)=x^2+10*cos(x)=0~ dentro del intervalo ~[3, 4]~, con
+    ~p_0=3.1~ y una tolerancia menor a ~1*10^(-4)~
+
+    solucion: De las distintas formas de despejar una ~x~ la que mejor
+        cumple con ~| g'(x_0)|<1~  es ~x=sqrt(-10*cos(x))~ por lo que
+	haga lo siguiente en /maxima/:
+	
+	#+BEGIN_EXAMPLE
+        (%i1) g(x):=sqrt( -10*cos(x) ); puntofijo(3.1, 4, 10);
+
+	(%o2)            g(x) := sqrt((- 10) cos(x))
+
+                    [ N     x        g(x)       error     ]
+                    [                                     ]
+                    [ 1    3.1     3.16091     0.06091    ]
+        (%o3)       [                                     ]
+                    [ 2  3.16091   3.161983   0.0010727   ]
+                    [                                     ]
+                    [ 3  3.161983  3.161949  3.3675621E-5 ]
+	#+END_EXAMPLE
+
+    por lo tanto la solución es ~g(x)=3.161949~. El código para
+    /maxima/ para la función /puntofijo/, utilizada en este
+    ejemplo es: (recuerde guardar el codigo en una archivo con la
+    extensión /mac/ y cargarlo con /load/)
+
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+puntofijo(p_0,expo,N):=block
+(    
+   [indice:0,sigo:true,p,TOL,er,tabla:matrix(['N,'x,'g(x),'error])],
+   fpprintprec:(expo+3),
+   TOL:(10)^(-expo),
+   for i:1 step 1 while (i<=N and sigo=true) do
+   (
+      indice:i,
+      p:g(p_0),
+
+      er:abs(p-p_0),
+
+      tabla:addrow(tabla,[i, p_0, p, er]),
+      
+      if (er < TOL) then
+      (
+         print("Tolerancia cumplida con exito, porque el error=",er),
+	 print( concat("es menor a la tolerancia=10^(-expo)=10^(-",expo,")=",TOL) ),
+	 print("Por lo tanto la solucion aproximada es:",p),
+	 sigo:false
+      ),
+    
+      p_0:p
+   ),
+   
+   if (indice=N) then 
+   (
+      print(concat("Parametro N=",N," se cumplio."))
+
+   ),
+
+   print("WeGT"),
+   return(tabla)
+)$
+/*#+END_EXAMPLE*/

@@ -1,0 +1,15 @@
+numer:true;
+
+ln(x):=log(x)/log(%e);
+
+load(biseccion);
+load(newton);
+load(puntofijo);
+load(secante);
+load(posicionfalsa);
+load(steffensen);
+load(polagrange);
+
+
+
+

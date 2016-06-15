@@ -1,0 +1,8 @@
+redondeo(num,decimales):=block
+(    
+   [a:0],
+   a:num*10^decimales,
+   a:a+0.0001,/*para que redondee como quiero los casos en que el decimal sea .5*/
+   a:round(a)*10^-decimales,
+   return(a)
+);

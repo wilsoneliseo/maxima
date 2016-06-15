@@ -1,0 +1,323 @@
+/*----------------REGRESION LINEAL, METODO MATRICIAL EN MAXIMA-------------------
+
+#+TITLE:     Regresión lineal, método matricial en Maxima
+#+AUTHOR:    Wilson S. Tubín
+#+EMAIL:     wilsoneliseogt@gmail.com
+#+DATE:      2016-02-25 jue
+#+DESCRIPTION: La funcion reglineal, realiza regresion lineal univariable o multivariable utilizando el metodo matricial
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+La función ~reglineal~ tiene como entrada una matriz de dos columnas
+por ~n~ filas. La primera columna representa las "x" y la segunda las
+"y".
+#+BEGIN_EXAMPLE
+*/
+numer:true$
+load(descriptive)$
+stardisp:true$ /*para que muestre * en las multiplicaciones*/
+reglineal(datos):=block
+(
+  [fila,columna,X,Y,A,B,b,minuendo,sustraendo,k,S2,mediaY,\
+  r2,varIzq,varDer,expresion,i,lx,ly,nmin,nmax,t,aux,inversaX_tX],
+
+  if ( matrixp(datos) ) then
+  (
+     fila:length(datos),
+     columna:length(datos[1]),
+
+     print("matrizDatos =",datos),
+     print("la ultima columna es la variable dependiente Y"),
+     print(""),
+     n:length(datos),     
+     print("n=",n),
+     print(""),
+     print("---------------------------------"),     
+     print("       RECTA DE REGRESION"),
+     print("---------------------------------"),
+     
+     /*extraer la columna y*/
+     Y:col(datos,columna),
+     print("Y =",Y),
+     print(""),
+
+     /*Formar la columna de unos: primero se crea la matriz. Luego se
+     va agregando mas filas de unos*/
+     X:matrix([1]),
+     for i:1 thru n-1 do
+     (
+        X:addrow(X,[1])
+     ),
+
+     /*agregar a la matriz X las columnas dependientes*/
+     X:addcol(X,submatrix(datos,columna)),
+
+     print("Paso 1. X =",X),
+     print(""),
+
+     /*transpuesta de X */
+     print("Paso 2. X' =",transpose(X)),
+     print(""),
+
+     /*producto entre transpuesta de X y X*/
+     print("Paso 3. (X'X) =",transpose(X).X),
+     print(""),
+
+     /*inversa de: producto entre transpuesta de X y X*/
+     print("Paso 4. (X'X)^(-1) =",invert(transpose(X).X)),
+     print(""),
+
+     /*producto entre transpuesta de X y matriz Y*/
+     print("Paso 5. (X'Y) =",transpose(X).Y),
+     print(""),
+
+     /*vector solucion*/
+     b:invert(transpose(X).X).(transpose(X).Y),
+     print("Paso 6. b = (X'X)^(-1)*(X'Y) =", b),
+
+     print(""),
+     print("------------------------------------------"),     
+     print("      VARIANZA Y DESVIACION ESTANDAR"),
+     print("------------------------------------------"),     
+     minuendo:transpose(Y).Y,
+     print("Paso 7. (Y'Y) =",transpose(Y),"*",Y,"=",minuendo),
+
+     sustraendo:transpose(b).(transpose(X).Y),
+     print("Paso 8. b'(X'Y) =",transpose(b),"*",transpose(X).Y,"=",sustraendo),
+
+     k:length(X[1])-1,
+     S2:(minuendo-sustraendo)/(n-k-1),
+     print("S^2=(SCE)/(n-k-1)=( (Y'Y) - b'(X'Y) )/(n-k-1)"),
+     print("S^2=(",minuendo,"-",sustraendo,")/(",n,"-",k,"-1)"),
+     print("S^2=(",minuendo-sustraendo,")/",n-k-1,"=",S2),
+     print("varianza = S^2 =",S2),
+     print("desviancion estandar = S =",sqrt(S2)),
+
+     print(""),
+     print("-----------------------------------------------"),
+     print("    COEFICIENTE DETERMINACION Y CORRELACION"),
+     print("------------------------------------------------"),
+     mediaY:mean(Y)[1],
+     print("promedio vector Y = ",mediaY),
+     print(" de Paso 7. (Y'Y)=",minuendo),
+     print(" de Paso 8. b'(X'Y)=",sustraendo),
+     r2:(sustraendo-n*mediaY^2)/(minuendo-n*mediaY^2),
+     print("r^2=( b'(X'Y) - n*mediaY^2  )/(  (Y'Y) - n*mediaY^2  )"),
+     print("r^2=(",sustraendo,"-",n,"*",mediaY,"^2)/(\
+",minuendo,"-",n,"*",mediaY,"^2)"),
+     print("coeficiente de determinacion r^2=",r2),
+     print("coeficiente de correlacion r=",sqrt(r2)),
+
+     /*----------DEFINIR FUNCION------------
+     definidendo la funcion (forma de cadena) de acuerdo a la matriz solucion b.
+     Luego parseando la cadena y definirla
+     */
+     varIzq:"define(f(",
+     varDer:concat("",b[1][1]),
+
+     for i:1 thru length(b)-1 do
+     ( 
+         varIzq:concat(varIzq,concat("x_",i,",")),
+
+         varDer:concat(varDer,"+",concat("x_",i,"*","(",b[i+1][1],")"))
+     ),
+     varIzq:substring(varIzq,1,slength(varIzq)),
+     expresion:concat(varIzq,"),",varDer,")"),
+     eval_string(expresion),
+
+     print(""),
+     print("------------FUNCION DE LA RECTA------------"),
+     print(fundef(f)),
+     print("-------------------------------------------"),     
+
+     /*-----GRAFICAR------*/
+     if(columna=2) then k:read("Graficar?"),
+     if (k=y) then
+     (
+       lx:transpose(datos)[1],
+       ly:transpose(datos)[2],
+       nmin:smin(lx),
+       nmax:smax(lx),
+
+       plot2d(
+         [ f,[discrete,lx,ly] ],[x,nmin,nmax],
+         [legend, "Recta de regresion","datos"],
+         [style, lines, points],
+         [point_type, bullet],
+         [gnuplot_term,wxt]
+        )/*fin plot2d*/
+     ),
+
+     print(""),
+     print("-----------------------------------------------"),
+     print("    INTERVALO DE CONFIANZA PARA COEFICIENTES"),
+     print("------------------------------------------------"),
+
+     /*t es t(alfa/2,n-k-1) donde alfa es la significancia, n el
+       numero de datos, k el numero de variables independientes.
+       t es la tabla de student. Para este ejemplo t(0.025,23)=2.0687
+       considerar esta nomenclatura: Y=B_0+B_1*X_1+B_2*X_2....*/
+     t:read("valor de t(alfa/2,n-k-1)?"),
+     inversaX_tX:invert(transpose(X).X),
+     for i:1 thru length(inversaX_tX) do
+     (
+         aux:t*sqrt(inversaX_tX[i][i]*S2),
+         print(concat("para B_",i-1," (",b[i][1]-aux,",",b[i][1]+aux,")")),
+         print(concat("   ","v(B)=",inversaX_tX[i][i],"*",S2,"=",inversaX_tX[i][i]*S2)),
+         print(concat("   ","raiz(v(B))=",sqrt(inversaX_tX[i][i]*S2)))
+     )
+  )
+  else
+    print("El argumento no es una matriz"),
+    
+  return("---WeGT---")
+)$
+
+xy(a):=block
+(
+    [n,resp:0],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      for i:1 thru n do
+      (
+        resp:resp+a[i][1]*a[i][2]
+      )
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+x(a):=block
+(
+    [n,resp:0],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      for i:1 thru n do
+      (
+        resp:resp+a[i][1]
+      )
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+y(a):=block
+(
+    [n,resp:0],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      for i:1 thru n do
+      (
+        resp:resp+a[i][2]
+      )
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+xx(a):=block
+(
+    [n,resp:0],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      for i:1 thru n do
+      (
+        resp:resp+(a[i][1])^2
+      )
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+yy(a):=block
+(
+    [n,resp:0],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      for i:1 thru n do
+      (
+        resp:resp+(a[i][2])^2
+      )
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+mcuad(a):=block
+(
+    [n,b_0,b_1,resp,se,r],
+    n:length(a),
+    if(matrixp(a) and length(a[1])=2) then
+    (
+      print("Coeficientes del modelo y=b_0+b_1*x"),
+      print(""),
+      b_1:(n*xy(a)-x(a)*y(a))/(n*xx(a)-x(a)^2),
+      print('b_1=(concat(n)*concat(xy(a))-concat(x(a))*\
+          concat(y(a)))/(concat(n)*concat(xx(a))-concat(x(a))^2),"=",b_1),
+
+      print(""),
+      b_0:y(a)/n-b_1*(x(a)/n),
+      print('b_0=concat(y(a))/concat(n)-concat(b_1)*(\
+          concat(x(a))/concat(n)),"=",b_0),
+
+      print(""),
+      print("varianza estimación"),
+      se:( (yy(a)-33.0122530896806*y(a)-0.7071934086828*xy(a))/(n-2) ),
+      print('S^2=(concat(yy(a))-concat(b_0)*y(a)-concat(b_1)*\
+              xy(a))/(concat(n)-2),"=",se),
+
+      print(""),
+      print("Error estandar estimación"),
+      print('S=sqrt(se)),
+
+
+      print(""),
+      print("Coeficiente de determinación"),
+      r:( (n*xy(a)-x(a)*y(a))^2 )/( (n*xx(a)-x(a)^2)*(n*yy(a)-y(a)^2) ),
+      print('r^2=( (concat(n)*xy(a)-concat(x(a))*y(a))^2 )/( \
+          (concat(n)*xx(a)-concat(x(a))^2)*(concat(n)*yy(a)\
+            -concat(y(a))^2) ),"=",r),
+      
+
+      print(""),
+      print("Coeficiente de correlación"),
+      print('r=sqrt(r)),
+      print(""),
+
+      resp:"WeGT"
+    ) 
+    else
+    (
+        print("El argumento no es una matriz o tiene mas de dos columnas")
+    ),
+  return(resp)
+)$
+
+/*#+END_EXAMPLE*/

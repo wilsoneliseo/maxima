@@ -1,0 +1,341 @@
+/*-----------------POLINOMIO DE INTERPOLACION DE LAGRANGE--------------------
+
+#+TITLE:     Polinomio de interpolación de Lagrange
+#+AUTHOR:    Wilson S. Tubín
+#+EMAIL:     wilsoneliseogt@gmail.com
+#+DATE:      2016-02-25 jue
+#+DESCRIPTION: programación de la función "polagrange(matriz);" que interpola grados 1, 2 y 3. Tambien permite graficar y tener una salida TeX del procedimiento.
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+En algunas ocasiones, no se tiene una funcion continua, sino valores
+de la funcion específicos ~f(x)~ para una ~x~ dada. A estas funciones se
+les conoce como funciones tabulares, y son de la siguiente forma:
+
+                   | x    | x_0    | x_1 ...    | x_n    |
+                   |------+--------+------------+--------|
+                   | f(x) | f(x_0) | f(x_0) ... | f(x_n) |
+
+La interpolacion consiste en hallar un dato ~f(x)~ dentro de una serie
+de /pares de puntos/ en el plano. La extrapolacion consiste en hallar un
+dato ~f(x)~ /fuera/ de una serie de /pares de puntos/ en el plano, pero debe
+tenerse en cuenta que este proximo a uno de sus extremos, pues en otro
+caso no es muy fiable el resultado obtenido.
+
+1) ENTRADA
+    - matriz de 2x2, 2x3 o 2x4, que constituyen los pares de puntos
+      para interpolacion grados 1, 2 y 3 respectivamente. La primera
+      fila son asumidas como los valores de x y la segunda fila como
+      los de y
+2) SALIDA
+    - polinomio de interpolacion y, si se quiere, grafica de los
+      puntos y el polinomio de interpolacion. Al respecto de esto
+      ultimo si se quiere grafica se contesta *y;* y si no *n;*
+
+3) EJEMPLO: Construya el Polinomio de Lagrange de Grado 1, 2 y 3 para
+      aproximar ~f(0.5)~ con la siguiente tabla:
+                  | x    | -2 | -1 | 0 |  1 | 2 |
+                  |------+----+----+---+----+---|
+                  | f(x) | -1 |  3 | 1 | -1 | 3 |
+
+    - GRADO 1. Escoger *dos* pares de puntos donde este comprendido el
+          dato a interpolar (~x=0.5~):
+                            | x    | 0 |  1 |
+                            |------+---+----|
+                            | f(x) | 1 | -1 |
+      hacer esto en /maxima/ (muestra de porción interactiva):
+      #+BEGIN_COMMENT
+      (%i1)  a:matrix( [0, 1],  [1, -1] ); polagrange(a);
+                       [ 0   1  ]
+      (%o1)            [        ]
+                       [ 1  - 1 ]
+      POLINOMIO DE LAGRANGE GRADO UNO 
+
+      (1) (x - 1)   (-1) (x - 0)
+      ----------- + ------------ = 1 - 2 x 
+         0 - 1         1 - 0
+ 
+      Salida TeX y graficar? si= y; no= n; 
+      (%i2) n;
+      (%o2)              p(x) := 1 - 2 x
+      (%i3) p(0.5);
+      (%o3)                  0.0
+      #+END_COMMENT
+
+      por lo tanto la aproximación es ~p(0.5)= 0~
+
+    - GRADO 2. Escoger *tres* pares de puntos donde este comprendido
+            el dato a interpolar (~x=0.5~):
+                         | x    | -1 | 0 |  1 |
+                         |------+----+---+----|
+                         | f(x) |  3 | 1 | -1 | 
+      hacer esto en /maxima/ (muestra de porción interactiva):
+      #+BEGIN_COMMENT  
+      (%i1) a:matrix( [-1, 0, 1],  [3, 1, -1] ); polagrange(a);
+                                [ - 1  0   1  ]
+      (%o1)                     [             ]
+                                [  3   1  - 1 ]
+      POLINOMIO DE LAGRANGE GRADO DOS 
+ 
+      3 (x - 0) (x - 1)   1 (x - -1) (x - 1)   -1 (x - -1) (x - 0)
+      ----------------- + ------------------ + ------------------- = 1 - 2 x 
+      (-1 - 0) (-1 - 1)    (0 - -1) (0 - 1)     (1 - -1) (1 - 0)
+ 
+      Salida TeX y graficar? si= y; no= n; 
+      (%i2) n;
+      (%o2)                     p(x) := 1 - 2 x
+      (%i3) p(0.5);
+      (%o3)                         0.0
+      #+END_COMMENT  
+
+      por lo tanto la aproximación de ~f(0.5)~ es ~0~
+
+    - GRADO 3. Escoger *cuatro* pares de puntos donde este comprendido el
+            dato a interpolar (~x=0.5~):
+                         | x    | -1 | 0 |  1 | 2 |
+                         |------+----+---+----+---|
+                         | f(x) |  3 | 1 | -1 | 3 |
+
+      hacer esto en /maxima/ (muestra de porción interactiva):
+
+      #+BEGIN_COMMENT  
+      (%i1) a:matrix( [-1, 0, 1, 2],  [3, 1, -1, 3] ); polagrange(a);
+                           [ - 1  0   1   2 ]
+      (%o1)                [                ]
+                           [  3   1  - 1  3 ]
+      POLINOMIO DE LAGRANGE GRADO TRES 
+ 
+      3 (x - 0) (x - 1) (x - 2)    1 (x - -1) (x - 1) (x - 2)
+      -------------------------- + -------------------------- +
+      (-1 - 0) (-1 - 1) (-1 - 2)    (0 - -1) (0 - 1) (0 - 2)
+
+             -1 (x - -1) (x - 0) (x - 2)   3 (x - -1) (x - 0) (x - 1)    3
+            --------------------------- + -------------------------- = x  - 3 x + 1 
+              (1 - -1) (1 - 0) (1 - 2)      (2 - -1) (2 - 0) (2 - 1)
+ 
+      Salida TeX y graficar? si= y; no= n;
+      (%i2) n;
+                                            3
+      (%o2)                       p(x) := x  - 3 x + 1
+      (%i3) p(0.5);
+      (%o3)                              - 0.375
+      #+END_COMMENT  
+
+      por lo tanto la aproximación de ~f(0.5)~ es ~0~
+   
+    - NOTA: la funcion "polagrange" pregunta si se quiere salida en
+          formato TeX y graficacion de los puntos y la curva de
+          interpolacion p(x). Por lo que y; es afirmativo y n; es
+          negativo.
+
+
+    El codigo de /maxima/ para la funcion /polagrange/
+    utililizada en este ejemplo es 
+#+BEGIN_COMMENT 
+*/
+numer:true$
+load(draw)$
+polagrange(tabla):=block
+(
+  [fila,columna,p,evalu,forma,resp,n1,d1,y1,n2,d2,y2,n3,d3,y3,n4,d4,y4],
+
+  if ( matrixp(tabla) ) then
+  (
+    fila:length(tabla),
+    columna:length(tabla[1]),
+    if (fila=2 and columna=2) then
+    (
+       print("POLINOMIO DE LAGRANGE GRADO UNO"),
+       print(""),
+       
+       evalu:((x-tabla[1][2])/(tabla[1][1]-tabla[1][2]))*tabla[2][1]+\
+       ((x-tabla[1][1])/(tabla[1][2]-tabla[1][1]))*tabla[2][2],
+       evalu:ratsimp(evalu),
+       define(p(x),evalu),
+
+
+       forma:((x-concat(tabla[1][2]))/(concat(tabla[1][1])-\
+           concat(tabla[1][2])))*concat("(",tabla[2][1],")")+\
+       ((x-concat(tabla[1][1]))/(concat(tabla[1][2])-\
+           concat(tabla[1][1])))* concat("(",tabla[2][2],")")=evalu,
+
+       print(forma),
+       print(fundef(p)),
+       print(""),
+
+       resp:read("Salida TeX y graficar? si= y; no= n;"),
+
+       if(is(resp=y)) then
+       (
+          tex(forma),
+	  tex('p(x)=evalu),
+          draw2d(
+             color=orange-red,
+	     title="INTERPOLACION GRADO UNO",
+	     key="Datos",
+             point_type=7,
+             point_size=2,
+             points(tabla),
+	     key="p(x)",
+             explicit(p(x),x,tabla[1][1]-1,tabla[1][2]+1),
+             terminal=wxt
+          )
+       )
+    )
+    elseif (fila=2 and columna=3) then
+    (
+       print("POLINOMIO DE LAGRANGE GRADO DOS"),
+       print(""),
+
+       n1:(x-tabla[1][2])*(x-tabla[1][3]),
+       d1:(tabla[1][1]-tabla[1][2])*(tabla[1][1]-tabla[1][3]),
+       y1:tabla[2][1],
+       
+       n2:(x-tabla[1][1])*(x-tabla[1][3]),
+       d2:(tabla[1][2]-tabla[1][1])*(tabla[1][2]-tabla[1][3]),
+       y2:tabla[2][2],
+
+       n3:(x-tabla[1][1])*(x-tabla[1][2]),
+       d3:(tabla[1][3]-tabla[1][1])*(tabla[1][3]-tabla[1][2]),
+       y3:tabla[2][3],
+
+       evalu:((n1/d1)*y1)+((n2/d2)*y2)+((n3/d3)*y3),
+       evalu:ratsimp(evalu),
+       define(p(x),evalu),
+
+       forma:(((x-concat(tabla[1][2]))*(x-concat(tabla[1][3])))/((concat\
+             (tabla[1][1])-concat(tabla[1][2]))*(concat(tabla[1][1])-\
+             concat(tabla[1][3]))))*concat(tabla[2][1])+(((x-concat(tabla[1][1]\
+               ))*(x-concat(tabla[1][3])))/((concat(tabla[1][2])-concat(\
+               tabla[1][1]))*(concat(tabla[1][2])-concat(tabla[1][3]))))*\
+             concat(tabla[2][2])+(((x-concat(tabla[1][1]))*(x-concat(tabla[1][2]\
+               )))/((concat(tabla[1][3])-concat(tabla[1][1]))*\
+             (concat(tabla[1][3])-concat(tabla[1][2]))))*\
+             concat(tabla[2][3])=evalu,
+
+       print(forma),
+       print(fundef(p)),
+       print(""),
+
+       resp:read("Salida TeX y graficar? si= y; no= n;"),
+
+       if(is(resp=y)) then
+       (
+          tex(forma),
+	  tex('p(x)=evalu),
+
+          draw2d(
+             color=dark-green,
+	     title="INTERPOLACION GRADO DOS",
+	     key="Datos",
+             point_type=7,
+             point_size=2,
+             points(tabla),
+	     key="p(x)",
+             explicit(p(x),x,tabla[1][1]-1,tabla[1][3]+1),
+             terminal=wxt
+          )
+       )
+      
+    )
+    elseif (fila=2 and columna=4) then
+    (
+       print("POLINOMIO DE LAGRANGE GRADO TRES"),
+       print(""),
+
+       n1:(x-tabla[1][2])*(x-tabla[1][3])\
+              *(x-tabla[1][4]),
+       d1:(tabla[1][1]-tabla[1][2])*(tabla[1][1]-tabla[1][3])\
+              *(tabla[1][1]-tabla[1][4]),
+       y1:tabla[2][1],
+
+
+
+       n2:(x-tabla[1][1])*(x-tabla[1][3])\
+              *(x-tabla[1][4]),
+       d2:(tabla[1][2]-tabla[1][1])*(tabla[1][2]-tabla[1][3])\
+              *(tabla[1][2]-tabla[1][4]),
+       y2:tabla[2][2],
+
+
+
+       n3:(x-tabla[1][1])*(x-tabla[1][2])\
+              *(x-tabla[1][4]),
+       d3:(tabla[1][3]-tabla[1][1])*(tabla[1][3]-tabla[1][2])\
+              *(tabla[1][3]-tabla[1][4]),
+       y3:tabla[2][3],
+
+
+
+       n4:(x-tabla[1][1])*(x-tabla[1][2])*(x-tabla[1][3]),
+       d4:(tabla[1][4]-tabla[1][1])*(tabla[1][4]-tabla[1][2])*\
+          (tabla[1][4]-tabla[1][3]),
+       y4:tabla[2][4],
+
+
+
+       evalu:( (n1/d1)*y1 )+( (n2/d2)*y2 )+( (n3/d3)*y3 )+( (n4/d4)*y4 ),
+       evalu:ratsimp(evalu),
+       define(p(x),evalu),
+
+
+       forma:(((x-concat(tabla[1][2]))*(x-concat(tabla[1][3]))*\
+           (x-concat(tabla[1][4])))/((concat(tabla[1][1])-concat(\
+           tabla[1][2]))*(concat(tabla[1][1])-concat(tabla[1][3]))*\
+           (concat(tabla[1][1])-concat(tabla[1][4]))))*concat(tabla[2][1])\
+           +(((x-concat(tabla[1][1]))*(x-concat(tabla[1][3]))*(x-\
+           concat(tabla[1][4])))/((concat(tabla[1][2])-concat(tabla[1][1]))*\
+           (concat(tabla[1][2])-concat(tabla[1][3]))*(concat(tabla[1][2])-\
+           concat(tabla[1][4]))))*concat(tabla[2][2])+(((x-concat(tabla[1][1]))\
+           *(x-concat(tabla[1][2]))*(x-concat(tabla[1][4])))/((concat(\
+           tabla[1][3])-concat(tabla[1][1]))*(concat(tabla[1][3])-concat(\
+           tabla[1][2]))*(concat(tabla[1][3])-concat(tabla[1][4]))))*concat(\
+           tabla[2][3])+(((x-concat(tabla[1][1]))*(x-concat(tabla[1][2]))*\
+           (x-concat(tabla[1][3])))/((concat(tabla[1][4])-concat(tabla[1][1]))*\
+           (concat(tabla[1][4])-concat(tabla[1][2]))*(concat(tabla[1][4])-\
+           concat(tabla[1][3]))))*concat(tabla[2][4])=evalu,
+
+
+       print(forma),
+       print(fundef(p)),
+       print(""),
+
+       resp:read("Salida TeX y graficar? si= y; no= n;"),
+
+       if(is(resp=y)) then
+       (
+          tex(forma),
+	  tex('p(x)=evalu),
+          draw2d(
+             color=dark-violet,
+	     title="INTERPOLACION GRADO TRES",
+	     key="Datos",
+             point_type=7,
+             point_size=2,
+             points(tabla),
+	     key="p(x)",
+             explicit(p(x),x,tabla[1][1]-1,tabla[1][4]+1),
+             terminal=wxt
+          )
+       )
+
+    )
+    else
+    (
+      print("La matriz del argumento requerido de: 2x2 2x3 o 2x4")      
+    )
+  
+  )
+  else
+    print("El argumento no es una tabla matriz."),
+    
+  return("---WeGT---")
+)$
+/*#+END_COMMENT*/
