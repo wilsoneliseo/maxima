@@ -1,0 +1,203 @@
+boole(numVariables, f):=block
+(    
+   [res,tabla,conv,A,B,C,D,E],
+   if(numVariables=2) then
+   (
+     tabla:matrix(['No,'A,'B,'f]),
+     conv:zeromatrix(4,4),
+     
+     /* columna uno */
+     conv[1][2]:false,conv[2][2]:false,conv[3][2]:true,conv[4][2]:true,
+
+     /* columna dos */
+     conv[1][3]:false,conv[2][3]:true,conv[3][3]:false,conv[4][3]:true,
+
+     for i:1 thru 4 do
+     (
+       A:conv[i][2],
+       B:conv[i][3],
+       conv[i][1]:cerosunos(A)*2^1+cerosunos(B)*2^0,
+       res:f(A,B),
+       conv[i][4]:res
+     )
+   )
+   elseif(numVariables=3) then
+   (
+     tabla:matrix(['No,'A,'B,'C,'f]),
+     conv:zeromatrix(8,5),
+     
+     /* columna uno */
+     conv[1][2]:false,conv[2][2]:false,conv[3][2]:false,conv[4][2]:false,
+     conv[5][2]:true,conv[6][2]:true,conv[7][2]:true,conv[8][2]:true,
+
+     /* columna dos */
+     conv[1][3]:false,conv[2][3]:false,conv[3][3]:true,conv[4][3]:true,
+     conv[5][3]:false,conv[6][3]:false,conv[7][3]:true,conv[8][3]:true,
+
+     /* columna tres */
+     conv[1][4]:false,conv[2][4]:true,conv[3][4]:false,conv[4][4]:true,
+     conv[5][4]:false,conv[6][4]:true,conv[7][4]:false,conv[8][4]:true,
+
+     for i:1 thru 8 do
+     (
+       A:conv[i][2],
+       B:conv[i][3],
+       C:conv[i][4],
+       conv[i][1]:cerosunos(A)*2^2+cerosunos(B)*2^1+cerosunos(C)*2^0,
+       res:f(A,B,C),
+       conv[i][5]:res
+     )
+
+   )
+   elseif(numVariables=4) then
+   (
+     tabla:matrix(['No,'A,'B,'C,'D,'f]),
+     conv:zeromatrix(16,6),
+     
+
+     /* columna uno */
+     conv[1][2]:false,conv[2][2]:false,conv[3][2]:false,conv[4][2]:false,
+     conv[5][2]:false,conv[6][2]:false,conv[7][2]:false,conv[8][2]:false,
+     conv[9][2]:true,conv[10][2]:true,conv[11][2]:true,conv[12][2]:true,
+     conv[13][2]:true,conv[14][2]:true,conv[15][2]:true,conv[16][2]:true,
+
+     /* columna dos */
+     conv[1][3]:false,conv[2][3]:false,conv[3][3]:false,conv[4][3]:false,
+     conv[5][3]:true,conv[6][3]:true,conv[7][3]:true,conv[8][3]:true,
+     conv[9][3]:false,conv[10][3]:false,conv[11][3]:false,conv[12][3]:false,
+     conv[13][3]:true,conv[14][3]:true,conv[15][3]:true,conv[16][3]:true,
+
+     /* columna tres */
+     conv[1][4]:false,conv[2][4]:false,conv[3][4]:true,conv[4][4]:true,
+     conv[5][4]:false,conv[6][4]:false,conv[7][4]:true,conv[8][4]:true,
+     conv[9][4]:false,conv[10][4]:false,conv[11][4]:true,conv[12][4]:true,
+     conv[13][4]:false,conv[14][4]:false,conv[15][4]:true,conv[16][4]:true,
+
+     /* columna cuatro */
+     conv[1][5]:false,conv[2][5]:true,conv[3][5]:false,conv[4][5]:true,
+     conv[5][5]:false,conv[6][5]:true,conv[7][5]:false,conv[8][5]:true,
+     conv[9][5]:false,conv[10][5]:true,conv[11][5]:false,conv[12][5]:true,
+     conv[13][5]:false,conv[14][5]:true,conv[15][5]:false,conv[16][5]:true,
+
+
+     for i:1 thru 16 do
+     (
+       A:conv[i][2],
+       B:conv[i][3],
+       C:conv[i][4],
+       D:conv[i][5],
+       conv[i][1]:cerosunos(A)*2^3+cerosunos(B)*2^2+cerosunos(C)*2^1+cerosunos(D)*2^0,
+       res:f(A,B,C,D),
+       conv[i][6]:res
+     )
+
+   )
+   elseif(numVariables=5) then
+   (
+     tabla:matrix(['No,'A,'B,'C,'D,'E,'f]),
+     conv:zeromatrix(32,7),
+     
+
+     /* columna uno */
+     conv[1][2]:false,conv[2][2]:false,conv[3][2]:false,conv[4][2]:false,
+     conv[5][2]:false,conv[6][2]:false,conv[7][2]:false,conv[8][2]:false,
+     conv[9][2]:false,conv[10][2]:false,conv[11][2]:false,conv[12][2]:false,
+     conv[13][2]:false,conv[14][2]:false,conv[15][2]:false,conv[16][2]:false,
+
+     conv[17][2]:true,conv[18][2]:true,conv[19][2]:true,conv[20][2]:true,
+     conv[21][2]:true,conv[22][2]:true,conv[23][2]:true,conv[24][2]:true,
+     conv[25][2]:true,conv[26][2]:true,conv[27][2]:true,conv[28][2]:true,
+     conv[29][2]:true,conv[30][2]:true,conv[31][2]:true,conv[32][2]:true,
+
+     /* columna dos */
+     conv[1][3]:false,conv[2][3]:false,conv[3][3]:false,conv[4][3]:false,
+     conv[5][3]:false,conv[6][3]:false,conv[7][3]:false,conv[8][3]:false,
+     conv[9][3]:true,conv[10][3]:true,conv[11][3]:true,conv[12][3]:true,
+     conv[13][3]:true,conv[14][3]:true,conv[15][3]:true,conv[16][3]:true,
+
+     conv[17][3]:false,conv[18][3]:false,conv[19][3]:false,conv[20][3]:false,
+     conv[21][3]:false,conv[22][3]:false,conv[23][3]:false,conv[24][3]:false,
+     conv[25][3]:true,conv[26][3]:true,conv[27][3]:true,conv[28][3]:true,
+     conv[29][3]:true,conv[30][3]:true,conv[31][3]:true,conv[32][3]:true,
+     
+
+     /* columna tres */
+     conv[1][4]:false,conv[2][4]:false,conv[3][4]:false,conv[4][4]:false,
+     conv[5][4]:true,conv[6][4]:true,conv[7][4]:true,conv[8][4]:true,
+     conv[9][4]:false,conv[10][4]:false,conv[11][4]:false,conv[12][4]:false,
+     conv[13][4]:true,conv[14][4]:true,conv[15][4]:true,conv[16][4]:true,
+
+     conv[17][4]:false,conv[18][4]:false,conv[19][4]:false,conv[20][4]:false,
+     conv[21][4]:true,conv[22][4]:true,conv[23][4]:true,conv[24][4]:true,
+     conv[25][4]:false,conv[26][4]:false,conv[27][4]:false,conv[28][4]:false,
+     conv[29][4]:true,conv[30][4]:true,conv[31][4]:true,conv[32][4]:true,
+     
+
+     /* columna cuatro */
+     conv[1][5]:false,conv[2][5]:false,conv[3][5]:true,conv[4][5]:true,
+     conv[5][5]:false,conv[6][5]:false,conv[7][5]:true,conv[8][5]:true,
+     conv[9][5]:false,conv[10][5]:false,conv[11][5]:true,conv[12][5]:true,
+     conv[13][5]:false,conv[14][5]:false,conv[15][5]:true,conv[16][5]:true,
+
+     conv[17][5]:false,conv[18][5]:false,conv[19][5]:true,conv[20][5]:true,
+     conv[21][5]:false,conv[22][5]:false,conv[23][5]:true,conv[24][5]:true,
+     conv[25][5]:false,conv[26][5]:false,conv[27][5]:true,conv[28][5]:true,
+     conv[29][5]:false,conv[30][5]:false,conv[31][5]:true,conv[32][5]:true,
+
+     /* columna cinco */
+     conv[1][6]:false,conv[2][6]:true,conv[3][6]:false,conv[4][6]:true,
+     conv[5][6]:false,conv[6][6]:true,conv[7][6]:false,conv[8][6]:true,
+     conv[9][6]:false,conv[10][6]:true,conv[11][6]:false,conv[12][6]:true,
+     conv[13][6]:false,conv[14][6]:true,conv[15][6]:false,conv[16][6]:true,
+
+     conv[17][6]:false,conv[18][6]:true,conv[19][6]:false,conv[20][6]:true,
+     conv[21][6]:false,conv[22][6]:true,conv[23][6]:false,conv[24][6]:true,
+     conv[25][6]:false,conv[26][6]:true,conv[27][6]:false,conv[28][6]:true,
+     conv[29][6]:false,conv[30][6]:true,conv[31][6]:false,conv[32][6]:true,
+
+
+     for i:1 thru 32 do
+     (
+       A:conv[i][2],
+       B:conv[i][3],
+       C:conv[i][4],
+       D:conv[i][5],
+       E:conv[i][6],
+       conv[i][1]:cerosunos(A)*2^4+cerosunos(B)*2^3+cerosunos(C)*2^2+cerosunos(D)*2^1\
+                  +cerosunos(E)*2^0,
+       res:f(A,B,C,D,E),
+       conv[i][7]:res
+     )
+
+   )
+   else
+      print("Numero de variables no implementada."),
+
+
+   if(numVariables<6 and numVariables>1) then
+   (
+        /* cambiar true por 1 y false por 0 */
+        for i:1 thru length(conv) do
+        (
+            for j:1 thru length(conv[1]) do
+            (
+              if(conv[i][j]=true) then
+                 conv[i][j]:1
+              elseif(conv[i][j]=false) then
+                 conv[i][j]:0
+              else
+                 conv[i][j]:conv[i][j]
+            )
+        )
+    ),
+
+   return(addrow(tabla, conv))
+)$
+
+cerosunos(boleano):=block
+(
+  if(boleano=true)then
+     return(1)
+  else
+     return(0)
+)$
