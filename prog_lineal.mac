@@ -1,0 +1,175 @@
+mdiv(m,fila,num):=block
+(
+  [resp],
+  resp:zeromatrix(1,length(m[1])),
+  for i:1 thru length(m[1]) do
+  (
+    resp[1][i]:m[fila][i]/num
+  ),
+  return(resp)
+)$
+
+op(m,piv,sol):=block
+(
+  [resp],
+  resp:zeromatrix(length(m),1),
+  resp[1][1]:"-",
+  for i:2 thru length(m) do
+  (
+    if (m[i][piv]#0) then
+    (
+      resp[i][1]:m[i][sol]/m[i][piv]
+    )
+    else
+    (
+      resp[i][1]:"indefinido"
+    )
+  ),
+  return(resp)
+)$
+
+simplex(m,fila,colm,num):=block
+(
+  [resp,fila_pivote,col_pivote],
+  resp:zeromatrix(length(m),length(m[1])),
+  fila_pivote:mdiv(m,fila,num),
+  col_pivote:col(m,colm),
+  
+  for i:1 thru length(m) do/* filas */         
+  (
+    if(i # fila) then /* # es igual a != en c, c++ */           
+      for j:1 thru length(m[1]) do/* columnas */           
+        resp[i][j]:(-1*fila_pivote[1][j]*col_pivote[i][1]+m[i][j])
+  ),
+
+  /* copiar fila pivote en respuesta */
+  for i:1 thru length(resp[1]) do
+     resp[fila][i]:fila_pivote[1][i],
+
+  return(resp)
+)$
+
+plot(lista,x1,x2):=block
+(
+  plot2d(lista,[x,x1,x2])
+  /* plot([h,f,g],0,5);  h, f y g son funciones definidas*/  
+)$
+/*
+numer:false$
+simplex_max(x,h,s):=block
+(
+  [tb,peque,op,fila,col_pivote,fila_pivote,s_copy,mr,xx,hh],
+  x:addrow(matrix(makelist(concat("X",i),i,length(x[1]))),x),
+  h:addrow(matrix(makelist(concat("H",i),i,length(h[1]))),h),
+  s_copy:copymatrix(s),
+  s_copy:addrow(matrix(["Solucion"]),s_copy),
+  tb:addcol(x,h),
+
+   peque:mas_pequeno_lista(tb),
+   if ( peque < 0  ) then
+   (
+     for i:1 thru length(tb[1]) do
+     (
+       if (tb[2][i]=peque) then
+       (
+         op:zeromatrix(length(s_copy),1),
+         for j:2 thru length(op) do
+         (
+           if(tb[j,i]#0) then
+           (
+              op[j,1]:s_copy[j,1]/tb[j,i]
+           )
+           else
+           (
+             op[j,1]:"indefinido",
+             print("indefinido")
+           )
+         ),
+         
+         op[1][1]:"Operacion",
+         print(addcol(addcol(tb,s_copy),op)),
+
+         fila:positivo_mas_pequeno(op),
+         col_pivote:col(tb,i),         
+         
+         for k:1 thru length(tb[1]) do
+         (
+           tb[fila+1][k]:tb[fila+1][k]/col_pivote[fila+1][1]
+         ),
+         fila_pivote:row(tb,fila+1),
+         s_copy[fila+1][1]:s_copy[fila+1][1]/col_pivote[fila+1][1],
+
+
+         for m:2 thru length(tb) do/* filas */         
+         (
+           if(m # fila+1) then /* # es igual a != en c, c++ */           
+           (
+              for n:1 thru length(tb[1]) do/* columnas */           
+              (
+                tb[m][n]:(-1*fila_pivote[1][n]*col_pivote[m][1]+tb[m][n])
+              ),
+              s_copy[m][1]:(-1*s_copy[fila+1][1]*col_pivote[m][1]+s_copy[m][1])
+           )           
+         ),
+         print(addcol(tb,s_copy)),
+         
+         mr:submatrix(1,tb),
+         xx:zeromatrix(length(x)-1,length(x[1])),
+         hh:zeromatrix(length(h)-1,length(h[1])),
+         for i:1 thru length(x)-1 do
+         (
+           for j:1 thru length(x[1]) do
+           (
+             xx[i][j]:mr[i][j]
+           )
+         ),
+
+         for i:1 thru length(h)-1 do
+         (
+           for j:1 thru length(h[1]) do
+           (
+             hh[i][j]:mr[i][j+length(x[1])]
+           )
+         ),
+         print("----------------------"),
+         print("----------------------"),
+         simplex_max(xx,hh,s_copy),
+         continue
+       )
+     )
+   )
+   else
+   (
+     print("acabo.")
+   )
+)$
+
+load (descriptive)$
+mas_pequeno_lista(m):=block/* m es matriz */
+(    
+   [resp,list],
+   list:list_matrix_entries(row(m, 2)),/* convertir matriz m en lista */
+   resp:smin(list),
+   return(resp)
+)$
+
+positivo_mas_pequeno(m):=block
+(
+  [positivo_peque],
+  positivo_peque:m[3][1],
+  for i:3 thru length(m) do
+  (
+    if(m[i][1]>0 and m[i][1] < positivo_peque) then
+    (
+      positivo_peque:m[i][1],
+      print(positivo_peque)
+    )
+  ),
+  return(positivo_peque)
+)$
+
+
+
+x:matrix([10,-20],[1,2],[-2,3]);h:matrix([0,0],[1,0],[0,1]);s:matrix([0],[4],[-6]);
+ */
+ 
