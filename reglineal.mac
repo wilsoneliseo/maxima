@@ -1,28 +1,6 @@
-/*----------------REGRESION LINEAL, METODO MATRICIAL EN MAXIMA-------------------
-
-#+TITLE:     Regresión lineal, método matricial en Maxima
-#+AUTHOR:    Wilson S. Tubín
-#+EMAIL:     wilsoneliseogt@gmail.com
-#+DATE:      2016-02-25 jue
-#+DESCRIPTION: La funcion reglineal, realiza regresion lineal univariable o multivariable utilizando el metodo matricial
-#+KEYWORDS: 
-#+LANGUAGE:  es
-#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
-#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
-#+LINK_UP:   
-#+LINK_HOME: 
-
-La función ~reglineal~ tiene como entrada una matriz de dos columnas
-por ~n~ filas. La primera columna representa las "x" y la segunda las
-"y".
-#+BEGIN_EXAMPLE
-*/
 numer:true$
 load(descriptive)$
-stardisp:true$ /*para que muestre * en las multiplicaciones*/
+stardisp:true$ /*para que muestre '*' en las multiplicaciones*/
 reglineal(datos):=block
 (
   [fila,columna,X,Y,A,B,b,minuendo,sustraendo,k,S2,mediaY,\

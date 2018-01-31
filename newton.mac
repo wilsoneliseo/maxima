@@ -1,62 +1,3 @@
-/*-------------------------NEWTON RAPHSON-------------------------
-#+TITLE:     newton.mac
-#+AUTHOR:    wilson
-#+EMAIL:     wilson@debian
-#+DATE:      2016-02-27 sáb
-#+DESCRIPTION: 
-#+KEYWORDS: 
-#+LANGUAGE:  en
-#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
-#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
-#+LINK_UP:   
-#+LINK_HOME: 
-
-Para encontrar la solucion ~f(x)=0~ se necesita la aproximacion
-incial ~p_0~.
-
-1) ENTRADA
-    - aproximacion inicial a la raiz ~p_0~
-    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
-      ~1*10^(-3)~ ~expo~ vale ~3~
-    - maximo numero de iteraciones ~N~
-2) SALIDA
-    - matriz con valores varios para cada iteracion, conteniendo
-      los valores aproximados de la solucion en la columna X_n+1
-3) EJEMPLO
-    Se quiere encontrar la raiz de ~f(x)=x-(sin(x))^2~ en donde
-    la aproximacion inicial ~p_0~ es ~1.2~ con una toleracia menor a ~1*10^(-4)~
-
-    solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
-        sesion en /maxima/ utilizando la funcion /newton/.
-	
-	#+BEGIN_EXAMPLE
-	(%i1) f(x):=x-(sin(x))^2-0.5; newton(1.2, 4, 8);
-
-        (%o1)          f(x) := x - sin (x) - 0.5
-
-                    [ N    X_n     X_n + 1      error     ]
-                    [                                     ]
-                    [ 1    1.2     1.719808    0.51981    ]
-                    [                                     ]
-                    [ 2  1.719808  1.532855    0.18695    ]
-        (%o2)       [                                     ]
-                    [ 3  1.532855  1.495748    0.037107   ]
-                    [                                     ]
-                    [ 4  1.495748  1.494137   0.0016106   ]
-                    [                                     ]
-                    [ 5  1.494137  1.494134  3.0265438E-6 ]
-	#+END_EXAMPLE
-
-    por lo tanto la solucion es ~X_n + 1=1.494134~. El código para
-    /maxima/ para la función /newton/, utilizada en este ejemplo
-    es: (recuerde guardar el codigo en una archivo con la extensión
-    /mac/ y cargarlo con /load/)
-
-#+BEGIN_EXAMPLE
-*/
 numer:true$
 newton(p_0,expo,N):=block
 (    
@@ -91,4 +32,3 @@ newton(p_0,expo,N):=block
    print("WeGT."),
    return(tabla)
 )$
-/*#+END_EXAMPLE*/

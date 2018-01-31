@@ -1,71 +1,3 @@
-/*------------------Interpolacion por metodo NEVILLE----------------------
-#+TITLE:     Interpolación por método de Neville
-#+AUTHOR:    Wilson S. Tubin
-#+EMAIL:     wilsoneliseogt@gmail.com
-#+DATE:      2016-02-27 sáb
-#+DESCRIPTION: Aproximacion de la raiz de una funcion continua por el metodo de Neville
-#+KEYWORDS: 
-#+LANGUAGE:  es
-#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
-#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
-#+LINK_UP:   
-#+LINK_HOME: 
-
-Para evaluar el polinomio ~P~ en los ~n + 1~ numeros distintos
-~x_0~ ,..., ~x_n~ con número ~x~ de la función ~f~:
-
-
-1) ENTRADA
-    - valor ~x~ donde ~f(x)~ es el valor a aproximar
-    - matrix de ~2xn~ o de ~nx2~. Para el primer caso la primera fila
-      corresponden a los numeros ~x_0~, ~x_1~ ,..., ~x_n~ y la segunda fila
-      los valores de la evaluacion de los ~x~ en la funcion ~f~. Para el
-      segundo caso son n filas de pares de valores en donde 
-      ~[x_0, f(x_0)]~, ~[x_1,f(x_1)]~ ,..., ~[x_n,f(x_n)]~
-
-2) SALIDA
-    - matriz con valores varios para cada iteracion, donde el valor de
-      la ultima columna es el resultado de la interpolacion o
-      extrapolacion buscada.
-3) EJEMPLO
-    Aplique el Método de Neville para aproximar ~f(7)~ utilizando los datos
-                            | x | f(x) |
-                            |---+------|
-                            | 3 |    8 |
-                            | 5 |   16 |
-                            | 6 |   23 |
-                            | 9 |   56 |
-
-    solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
-        sesion en /maxima/ utilizando la funcion /neville/.
-	
-	#+BEGIN_EXAMPLE
-	(%i1) a:matrix([3,5,6,9],[8,16,23,56]);
-                     [ 3  5   6   9  ]
-        (%o1)        [               ]
-                     [ 8  16  23  56 ]
-        (%i2) neville(7,a);
-                 [ X  Y   Columna 1  Columna 2  Columna 3 ]
-                 [                                        ]
-                 [ 3  8       0          0          0     ]
-                 [                                        ]
-        (%o2)    [ 5  16     24          0          0     ]
-                 [                                        ]
-                 [ 6  23     30         32          0     ]
-                 [                                        ]
-                 [ 9  56     34         32         32     ]
-	#+END_EXAMPLE
-
-    por lo tanto la interpolación, de ~f(7)~, es la ultima columna que
-    es ~32~. El código para /maxima/ para la función /neville/,
-    utilizada en este ejemplo es: (recuerde guardar el codigo en una
-    archivo con la extensión /mac/ y cargarlo con /load/)
-
-#+BEGIN_EXAMPLE
-*/
 numer:true$
 neville(valor,tabla):=block
 (
@@ -102,4 +34,3 @@ neville(valor,tabla):=block
     
     return(resp)
 )$
-/*#+END_EXAMPLE*/

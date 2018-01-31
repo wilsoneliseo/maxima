@@ -1,62 +1,3 @@
-/*-----------------------METODO DE SECANTE----------------------
-#+TITLE:     secante.mac
-#+AUTHOR:    wilson
-#+EMAIL:     wilson@debian
-#+DATE:      2016-02-27 sáb
-#+DESCRIPTION: 
-#+KEYWORDS: 
-#+LANGUAGE:  en
-#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
-#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
-#+LINK_UP:   
-#+LINK_HOME: 
-
-Para encontrar la solucion ~f(x)=0~ se necesita el intervalo
-~[p_0, p_1]~ en el cual se encuentra la raiz.
-
-1) ENTRADA
-    - valores ~p_0~ ~p_1~
-    - exponente ~expo~ de la tolerancia. Por ejemplo en la tolerancia
-      ~1*10^(-3)~ ~expo~ vale ~3~
-    - maximo numero de iteraciones ~N~
-2) SALIDA
-    - matriz con valores varios para cada iteracion, conteniendo
-      los valores aproximados de la solucion en la columna ~X_n+1~
-3) EJEMPLO: Aplique el metodo de la secante para encontrar la raiz en
-    el intervalo ~[0, 1.5708]~ de la funcion ~f(x):=x-0.8-0.2*sin(x)~ con
-    una ~tolerancia<1*10^(-5)~
-
-    solucion: haga esto en /maxima/. Lo siguiente es la muestra de una
-        sesion en /maxima/ utilizando la funcion /secante/.
-	
-	#+BEGIN_EXAMPLE
-        (%i1) f(x):=x-0.8-0.2*sin(x); secante(0,1.5708, 5, 15);
-
-        (%o1)          f(x) := x - 0.8 + (- 0.2) sin(x)
-
-              [ N  X_n - 1     X_n     X_n + 1       error     ]
-              [                                                ]
-              [ 1     0       1.5708   0.91672      0.65408    ]
-              [                                                ]
-              [ 2   1.5708   0.91672   0.961551    0.0448311   ]
-        (%o5) [                                                ]
-              [ 3  0.91672   0.961551  0.964346   0.00279479   ]
-              [                                                ]
-              [ 4  0.961551  0.964346  0.964334  1.22007888E-5 ]
-              [                                                ]
-              [ 5  0.964346  0.964334  0.964334  3.14643311E-9 ]
-	#+END_EXAMPLE
-
-    por lo tanto la solucion es ~X_n + 1=0.964334~. El codigo para
-    /maxima/ para la función /secante/, utilizada en este ejemplo
-    es: (recuerde guardar el codigo en una archivo con la extensión
-    /mac/ y cargarlo con /load/)
-
-#+BEGIN_EXAMPLE
-*/
 numer:true$
 secante(p_0,p_1,expo,N):=block
 (    
@@ -97,4 +38,3 @@ secante(p_0,p_1,expo,N):=block
    print("WeGT."),
    return(tabla)
 )$
-/*#+END_EXAMPLE*/
